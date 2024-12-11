@@ -73,15 +73,14 @@ async function displayTransactions() {
 window.onload = () => {
     displayTransactions()
     updateDatalists()
+    document.getElementById( 'description-input' ).addEventListener( 'input', async ( event ) => {
+        const description = event.target.value
+        const response = await fetch( `/api/last-transaction?description=${encodeURIComponent(description)}` )
+    
+        if ( response.ok ) {
+            const lastTransaction = await response.json()
+            document.getElementById( 'amount-input' ).value = lastTransaction.amount
+            document.getElementById( 'source-input' ).value = lastTransaction.source
+        }
+    })
 }
-
-document.getElementById( 'description-input' ).addEventListener( 'input', async ( event ) => {
-    const description = event.target.value
-    const response = await fetch( `/api/last-transaction?description=${encodeURIComponent(description)}` )
-
-    if ( response.ok ) {
-        const lastTransaction = await response.json()
-        document.getElementById( 'amount-input' ).value = lastTransaction.amount
-        document.getElementById( 'source-input' ).value = lastTransaction.source
-    }
-})
