@@ -8,6 +8,31 @@
             return response.json()
         }
 
+        async function updateDatalists() {
+            const transactions = await fetchTransactions()
+            const descriptionList = document.getElementById('description-list')
+            const sourceList = document.getElementById('source-list')
+
+            // Popola le opzioni uniche per Descrizione e Sorgente
+            const descriptions = [...new Set(transactions.map(t => t.description))]
+            const sources = [...new Set(transactions.map(t => t.source))]
+
+            descriptionList.innerHTML = ''
+            sourceList.innerHTML = ''
+
+            descriptions.forEach(desc => {
+                const option = document.createElement('option')
+                option.value = desc
+                descriptionList.appendChild(option)
+            })
+
+            sources.forEach(source => {
+                const option = document.createElement('option')
+                option.value = source
+                sourceList.appendChild(option)
+            })
+        }
+
         async function addTransaction( event ) {
             event.preventDefault()
             const formData = new FormData( event.target )
@@ -26,6 +51,7 @@
 
             event.target.reset()
             displayTransactions()
+            updateDatalists()
         }
 
         async function displayTransactions() {
@@ -42,6 +68,7 @@
 
         window.onload = () => {
             displayTransactions()
+            updateDatalists()
         }
     </script>
 </head>
