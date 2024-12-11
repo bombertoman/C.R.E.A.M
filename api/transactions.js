@@ -53,6 +53,24 @@ app.get('/api/totals', (req, res) => {
     res.json(totals)
 })
 
+app.get( '/api/last-transaction', ( req, res ) => {
+    const { description } = req.query
+
+    if ( !description ) {
+        return res.status( 400 ).json( { error: 'Description is required.' } )
+    }
+
+    const lastTransaction = transactions
+        .filter( t => t.description === description )
+        .sort( ( a, b ) => b.id - a.id )[0]
+
+    if ( lastTransaction ) {
+        res.json( lastTransaction )
+    } else {
+        res.status( 404 ).json( { error: 'No transaction found for this description.' } )
+    }
+})
+
 // Serve static files
 app.use(express.static(path.join(__dirname, '../public')))
 
