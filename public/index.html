@@ -7,6 +7,10 @@
     <script>
         async function fetchTransactions() {
             const response = await fetch( '/api/transactions' )
+            if ( !response.ok ) {
+                document.getElementById('error-message').textContent = 'Error: Unable to fetch transactions.'
+                return []
+            }
             return response.json()
         }
 
@@ -45,11 +49,16 @@
                 source: formData.get( 'source' )
             }
 
-            await fetch( '/api/transactions', {
+            const response = await fetch( '/api/transactions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify( transaction )
             })
+
+            if ( !response.ok ) {
+                document.getElementById('error-message').textContent = 'Error: Unable to add transaction.'
+                return
+            }
 
             event.target.reset()
             displayTransactions()
@@ -76,6 +85,7 @@
 </head>
 <body>
     <h1><i class='fas fa-coins'></i> Expense Tracker</h1>
+    <p id="error-message" style="color: red;"></p>
     <form id="transaction-form" onsubmit="addTransaction(event)">
         <input type="date" name="date">
         <input type="text" name="description" placeholder="Description" list="description-list" required>
