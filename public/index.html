@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <script>
+        async function fetchTransactions() {
+            const response = await fetch( '/api/transactions' )
+            return response.json()
+        }
+
+        async function addTransaction( event ) {
+            event.preventDefault()
+            const formData = new FormData( event.target )
+            const transaction = {
+                date: formData.get( 'date' ) || null,
+                description: formData.get( 'description' ),
+                amount: formData.get( 'amount' ),
+                source: formData.get( 'source' )
+            }
+
+            await fetch( '/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify( transaction )
+            })
+
+            event.target.reset()
+            displayTransactions()
+        }
+
+        async function displayTransactions() {
+            const transactions = await fetchTransactions()
+            const list = document.getElementById( 'transaction-list' )
+            list.innerHTML = ''
+
+            transactions.forEach( t => {
+                const item = document.createElement( 'li' )
+                item.textContent = `${t.date} - ${t.description}: €${t.amount} (${t.source})`
+                list.appendChild( item )
+            })
+        }
+
+        window.onload = () => {
+            displayTransactions()
+        }
+    </script>
+</head>
+<body>
+    <h1>Expense Tracker</h1>
+    <form id="transaction-form" onsubmit="addTransaction(event)">
+        <input type="date" name="date">
+        <input type="text" name="description" placeholder="Description" list="description-list" required>
+        <datalist id="description-list">
+            <!-- Populate dynamically -->
+        </datalist>
+        <input type="number" name="amount" placeholder="Amount (€)" step="0.01" required>
+        <input type="text" name="source" placeholder="Source" list="source-list" required>
+        <datalist id="source-list">
+            <!-- Populate dynamically -->
+        </datalist>
+        <button type="submit">Add</button>
+    </form>
+    <ul id="transaction-list"></ul>
+</body>
+</html>
